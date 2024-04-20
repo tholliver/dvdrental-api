@@ -19,10 +19,16 @@ class CustomerController {
 
   static async getCustomer(req: Request<{ id: number }>, res: Response) {
     const customerFound = await dbConn.query.customerSchema.findFirst({
-      where: (customerSchema, { eq }) =>
-        eq(customerSchema.customer_id, req.params.id),
-      with: { address: true },
+      where: eq(customerSchema.customer_id, Number(req.params.id)),
+      with: {
+        address: {
+          with: {
+            city: true
+          }
+        }
+      },
     })
+
     const [avgCustomerPayment] = await GetSummaryCustomerPayments(req.params.id)
 
     if (customerFound && avgCustomerPayment)

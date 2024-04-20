@@ -1,15 +1,9 @@
 import dbConn from '../dbConn'
 import { sql, sum, between, desc, eq } from 'drizzle-orm'
-import { timeLapseConverter } from '../../utils/repo-utils'
-// import {
-//     filmSchema,
-//     inventorySchema,
-//     rentalSchema,
-//     paymentSchema,
-// } from '../schemas/index'
+import { getGroupByKey, timeLapseConverter } from '../../utils/repo-utils'
 
 import { filmSchema, rentalSchema, inventorySchema, paymentSchema } from '../schema'
-import { eGroupBy, GroupByType } from '../../typos'
+import { GroupByType } from '../../typos'
 
 export const GetOneCustomerRentals = async (customerId: number) => {
     return await dbConn
@@ -30,15 +24,6 @@ export const GetOneCustomerRentals = async (customerId: number) => {
             eq(paymentSchema.rental_id, rentalSchema.rental_id)
         )
         .where(eq(rentalSchema.customer_id, customerId))
-
-    // .where(`${rentalSchema.customer_id} = ${customerId}`)
-    // rentalSchema.customer_id, `${customerId}`
-    // `${rentalSchema.customer_id}=${customerId}`
-    // .groupBy(
-    //   filmSchema.titulo,
-    //   rentalSchema.fecha_de_renta,
-    //   rentalSchema.fecha_de_retorno
-    // )
 }
 
 export const GetTopRentedFilmsTimeLapsed = async (time: string, lapse: number) => {
@@ -99,26 +84,14 @@ export const GetTopRentedFilms = async () => {
     return queryRes
 }
 
-function getGroupByKey(key: keyof GroupByType) {
-    const groupByEnums = {
-        day: { spec: 'day', format: 'YYYY-MM-DD' },
-        month: { spec: 'month', format: 'YYYY-MM' },
-        year: { spec: 'year', format: 'YYYY' },
-    }
-    // console.log('Here the obj', groupByEnums[key]);
-    return groupByEnums[key];
-}
-
 export const GetRentsByDateGroup = async (by: string) => {
     const groupBy = getGroupByKey(by as keyof GroupByType)
     return await dbConn.execute(
         sql.raw(`select TO_CHAR(DATE_TRUNC('${groupBy.spec}', return_date), '${groupBy.format}') AS date, count(*) 
-                    from rental
-                    group by DATE_TRUNC('${groupBy.spec}', return_date)
-                    order by date
-                    limit 7
+                from rental
+                group by DATE_TRUNC('${groupBy.spec}', return_date)
+                order by date
+                limit 7
                 `)
     )
-
-    // groupBy[by].spec
 }

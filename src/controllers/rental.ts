@@ -15,7 +15,7 @@ class RentalController {
         console.log(customer_id, typeof customer_id)
 
         try {
-            const customerRentals = await GetOneCustomerRentals(customer_id)
+            const customerRentals = await GetOneCustomerRentals(Number(customer_id))
             return res.status(200).json(customerRentals)
         } catch (error) {
             console.log('Something happened:', error)

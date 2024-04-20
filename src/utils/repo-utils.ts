@@ -1,8 +1,10 @@
+import { GroupByType } from "../typos"
+
 export const timeLapseConverter = (time: string, lapse: number) => {
   const splitedDate = dateLapseParser(time, lapse)
   return splitedDate?.toISOString().split('T')[0]
 }
-
+// To get some date ago given a lapse 
 function dateLapseParser(time: string, lapse: number) {
   const currentNowDate = new Date()
   // CASE LAST N [YEARS] AGO
@@ -33,4 +35,12 @@ function dateLapseParser(time: string, lapse: number) {
   }
 }
 
-// console.log(timeLapseConverter('m', 7))
+
+export function getGroupByKey(key: keyof GroupByType) {
+  const groupByEnums = {
+    day: { spec: 'day', format: 'YYYY-MM-DD' },
+    month: { spec: 'month', format: 'YYYY-MM' },
+    year: { spec: 'year', format: 'YYYY' },
+  }
+  return groupByEnums[key];
+}

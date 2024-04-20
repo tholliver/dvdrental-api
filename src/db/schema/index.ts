@@ -22,7 +22,7 @@ export const storeSchema = pgTable('store', {
 })
 
 export const customerSchema = pgTable('customer', {
-    customer_id: serial('customer_id').notNull(),
+    customer_id: serial('customer_id').primaryKey().notNull(),
     store_id: integer('store_id'),
     first_name: varchar('first_name', { length: 50 }),
     last_name: varchar('last_name', { length: 50 }),
@@ -114,6 +114,33 @@ export const addressSchema = pgTable('address', {
     last_update: timestamp('last_update').defaultNow(),
 })
 
+
+export const countrySchema = pgTable('country', {
+    country_id: serial('country_id').primaryKey().notNull(),
+    country: varchar('country', { length: 50 }).notNull(),
+    last_update: timestamp('last_update').defaultNow()
+})
+
+export const countryRelations = relations(countrySchema, ({ many }) => ({
+    cities: many(citySchema)
+}))
+
+export const citySchema = pgTable('city', {
+    city_id: serial('city_id').primaryKey().notNull(),
+    city: varchar('city', { length: 50 }),
+    country_id: smallint('country_id').notNull(),
+    last_update: timestamp('last_update').defaultNow()
+})
+
+export const cityRelations = relations(citySchema, ({ one, many }) => ({
+    country: one(countrySchema, {
+        fields: [citySchema.city_id],
+        references: [countrySchema.country_id]
+    }),
+    address: many(addressSchema)
+})
+)
+
 export const paymentSchema = pgTable('payment', {
     payment_id: serial('payment_id').notNull(),
     customer_id: smallint('customer_id')
@@ -128,6 +155,7 @@ export const paymentSchema = pgTable('payment', {
     amount: numeric('amount').notNull(),
     payment_date: timestamp('payment_date').notNull(),
 })
+
 export const customerRelationships = relations(
     customerSchema,
     ({ many, one }) => ({
@@ -177,6 +205,10 @@ export const categoriesRelationships = relations(
 
 export const addressRelationships = relations(addressSchema, ({ one }) => ({
     customer: one(customerSchema),
+    city: one(citySchema, {
+        fields: [addressSchema.city_id],
+        references: [citySchema.city_id]
+    })
 }))
 
 export const paymentRelationships = relations(paymentSchema, ({ one }) => ({

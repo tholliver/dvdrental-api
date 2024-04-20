@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/api/index.ts",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon ./src/api/index.ts",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/api/index.js",
     "tsc": "tsc",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
