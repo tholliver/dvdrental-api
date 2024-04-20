@@ -15,7 +15,5 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 3005
 const MONGO_URI = process.env.MONGO_URI
 const PG_URI = process.env.PG_URI
-// const PG_URI = process.env.PG_PRO_URI
-
 
 export { PORT, MONGO_URI, PG_URI }

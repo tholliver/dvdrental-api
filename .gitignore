@@ -4,3 +4,4 @@ json_data
 **/*.env*
 build
 dist
+.vercel
