@@ -35,8 +35,7 @@ export const GetAllPaymentsByDate = async (by: string) => {
             from payment
             group by DATE_TRUNC('${groupBy.spec}', payment_date)
             order by date
-            limit 7
-            `)
+            limit 7`)
   )
   // [FIX] -> 
   // PostgresError: column "payment.payment_date" must appear in the GROUP BY clause or be used in an aggregate function
