@@ -86,8 +86,11 @@ export const GetTopRentedFilms = async () => {
 
 export const GetRentsByDateGroup = async (by: string) => {
     const groupBy = getGroupByKey(by as keyof GroupByType)
+
     return await dbConn.execute(
-        sql.raw(`select TO_CHAR(DATE_TRUNC('${groupBy.spec}', return_date), '${groupBy.format}') AS date, count(*) 
+        sql.raw(`select TO_CHAR(DATE_TRUNC('${groupBy.spec}', return_date),
+                        '${groupBy.format}') AS date,
+                         count(*) 
                 from rental
                 group by DATE_TRUNC('${groupBy.spec}', return_date)
                 order by date

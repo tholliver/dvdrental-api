@@ -31,8 +31,9 @@ class PaymentController {
   }
 
   static async getPayementsByDate(req: Request, res: Response, next: NextFunction) {
+    const { by } = req.query
     try {
-      const payments = await GetAllPaymentsByDate()
+      const payments = await GetAllPaymentsByDate(String(by))
       res.json(payments)
     } catch (error) {
       next(error)

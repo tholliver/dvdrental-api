@@ -7,6 +7,8 @@ import {
   rentalSchema,
   filmSchema,
 } from '../schema'
+import { GroupByType } from '../../typos'
+import { getGroupByKey } from '../../utils/repo-utils'
 
 export const GetCustomerPayemnts = async (userId: number) => {
   return await dbConn
@@ -23,15 +25,29 @@ export const GetCustomerPayemnts = async (userId: number) => {
     )
 }
 
-export const GetAllPaymentsByDate = async () => {
-  return await dbConn
-    .select({
-      date: sql`TO_CHAR(DATE_TRUNC('day', ${paymentSchema.payment_date}), 'YYYY-MM-DD') AS date_only`,
-      dayTotal: sum(paymentSchema.amount),
-    })
-    .from(paymentSchema)
-    .groupBy(sql`DATE_TRUNC('day',${paymentSchema.payment_date})`)
-    .orderBy(sql`DATE_TRUNC('day',${paymentSchema.payment_date})`)
+export const GetAllPaymentsByDate = async (by: string) => {
+  const groupBy = getGroupByKey(by as keyof GroupByType)
+
+  return await dbConn.execute(
+    sql.raw(`select TO_CHAR(DATE_TRUNC('${groupBy.spec}', payment_date),
+                    '${groupBy.format}') AS date,
+                     sum(amount) as dayTotal
+            from payment
+            group by DATE_TRUNC('${groupBy.spec}', payment_date)
+            order by date
+            limit 7
+            `)
+  )
+  // [FIX] -> 
+  // PostgresError: column "payment.payment_date" must appear in the GROUP BY clause or be used in an aggregate function
+  // return await dbConn
+  //   .select({
+  //     date: sql`TO_CHAR(DATE_TRUNC('${groupBy.spec}', ${paymentSchema.payment_date}), '${groupBy.format}') AS date_only`,
+  //     dayTotal: sum(paymentSchema.amount),
+  //   })
+  //   .from(paymentSchema)
+  //   .groupBy(sql`DATE_TRUNC('${groupBy.spec}',${paymentSchema.payment_date})`)
+  //   .orderBy(sql`DATE_TRUNC('${groupBy.spec}',${paymentSchema.payment_date})`)
 }
 
 export const GetSummaryCustomerPayments = async (customerId: number) => {

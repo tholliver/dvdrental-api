@@ -12,38 +12,84 @@ import {
   getAllFilms,
   getFilmByCategory,
   getFilmByCategoryAndName,
+  getFilmByTitleAndRating,
+  getFilmByCategoryAndRating,
+  getFilmByCategoryAndNameAndRating,
+  getFilmByRating
 } from '../db/repository/films-repo'
 
 const filmRouter = Router()
 
 class FilmsController {
   static async searchFilms(req: Request, res: Response, next: NextFunction) {
-    const { category, title } = req.query
-    const offset = req.query.offset
+    const { category, rating, title, offset } = req.query;
     try {
-      if (category && title) {
+      if (category && title && rating) {
+        const categorizedFilm = await getFilmByCategoryAndNameAndRating(
+          String(title),
+          String(category),
+          String(rating),
+          Number(offset)
+        );
+        return res.status(200).send(categorizedFilm);
+      }
+
+      if (category && title && !rating) {
         const categorizedFilm = await getFilmByCategoryAndName(
           String(title),
           String(category),
           Number(offset)
-        )
-        return res.status(200).send(categorizedFilm)
+        );
+        return res.status(200).send(categorizedFilm);
       }
 
-      if (category && !title) {
-        const filmsByCategory = await getFilmByCategory(String(category), Number(offset))
-        return res.status(200).send(filmsByCategory)
+      if (category && !title && rating) {
+        const filmsByCategory = await getFilmByCategoryAndRating(
+          String(category),
+          String(rating),
+          Number(offset)
+        );
+        return res.status(200).send(filmsByCategory);
       }
 
-      if (title && !category) {
-        const film = await getFilmByTitle(String(title), Number(offset))
-        return res.status(200).send(film)
+      if (category && !title && !rating) {
+        const filmsByCategory = await getFilmByCategory(
+          String(category),
+          Number(offset)
+        );
+        return res.status(200).send(filmsByCategory);
       }
 
-      const films = await getAllFilms(Number(offset))
-      return res.status(200).send(films)
+      if (!title && !category && rating) {
+        const films = await getFilmByRating(
+          String(rating),
+          Number(offset)
+        );
+        return res.status(200).send(films);
+
+      }
+
+      if (title && !category && rating) {
+        const film = await getFilmByTitleAndRating(
+          String(title),
+          String(rating),
+          Number(offset)
+        );
+        return res.status(200).send(film);
+      }
+
+      if (title && !category && !rating) {
+        const film = await getFilmByTitle(
+          String(title),
+          Number(offset)
+        );
+        return res.status(200).send(film);
+      }
+
+      const films = await getAllFilms(Number(offset));
+      return res.status(200).send(films);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
