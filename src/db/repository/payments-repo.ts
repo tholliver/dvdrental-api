@@ -31,7 +31,7 @@ export const GetAllPaymentsByDate = async (by: string) => {
   return await dbConn.execute(
     sql.raw(`select TO_CHAR(DATE_TRUNC('${groupBy.spec}', payment_date),
                     '${groupBy.format}') AS date,
-                     sum(amount) as dayTotal
+                     sum(amount) as daytotal
             from payment
             group by DATE_TRUNC('${groupBy.spec}', payment_date)
             order by date
