@@ -2,6 +2,7 @@ import dbConn from '../dbConn'
 import { sql, count, and, gt, lt, sum } from 'drizzle-orm'
 import {
   customerSchema,
+  filmSchema,
   inventorySchema,
   paymentSchema,
   rentalSchema,
@@ -12,7 +13,7 @@ export async function getTotalRentsByDate(startDate: string) {
 
   return await dbConn
     .select({
-      totalRents: count(),
+      totalRents: count(rentalSchema.rental_date),
     })
     .from(rentalSchema)
     .where(
@@ -33,9 +34,13 @@ export async function getTotalPaysByDate(startDate: string) {
 
 export async function unitsOnInventory(startDate: string) {
   let currentDate = new Date().toISOString().slice(0, 10)
-  return await dbConn.select({ units: count() }).from(inventorySchema)
+  return await dbConn.select({ units: count(inventorySchema.film_id) }).from(inventorySchema)
 }
 
 export async function getTotalCustomers() {
-  return await dbConn.select({ totalCustomers: count() }).from(customerSchema)
+  return await dbConn.select({ totalCustomers: count(customerSchema.first_name) }).from(customerSchema)
+}
+
+export async function getTotalFilms() {
+  return await dbConn.select({ totalFilms: count(filmSchema.title) }).from(filmSchema)
 }
