@@ -77,3 +77,6 @@ export const GetSummaryCustomerPayments = async (customerId: number) => {
     .groupBy(customerSchema.first_name, customerSchema.last_name)
     .limit(1)
 }
+
+export const GetPayments = async (customerId: number) => {
+}
